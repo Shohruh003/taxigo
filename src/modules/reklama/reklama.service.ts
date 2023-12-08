@@ -19,8 +19,13 @@ export class ReklamaService {
         const reklama = this.reklamaRepository.create();
         reklama.message_id = data.message_id;
         reklama.from_id = data.from_id;
+        reklama.message_text = data.message_text;
           console.log(reklama);
         await this.reklamaRepository.save(reklama);
         return reklama;
+      }
+
+      async delete(from_id: string) {
+        await this.reklamaRepository.delete({ from_id });
       }
 }

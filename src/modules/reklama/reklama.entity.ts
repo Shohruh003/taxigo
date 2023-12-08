@@ -16,4 +16,10 @@ export class Reklama extends BaseEntity{
     nullable: true,
   })
   message_id: string;
+
+  @Column({
+    type: 'varchar',
+    nullable: true,
+  })
+  message_text: string;
 }

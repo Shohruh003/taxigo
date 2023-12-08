@@ -19,8 +19,12 @@ export class MessageService {
         const message = this.messageRepository.create();
         message.message_id = data.message_id;
         message.from_id = data.from_id;
-          console.log(message);
+        message.message_text = data.message_text;
         await this.messageRepository.save(message);
         return message;
+      }
+
+      async delete(from_id: string) {
+        await this.messageRepository.delete({ from_id });
       }
 }

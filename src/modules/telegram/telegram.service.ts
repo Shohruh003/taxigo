@@ -17,6 +17,9 @@
       private isText: boolean = false;
       private interval: NodeJS.Timeout;
       private userId: string;
+      private readonly admin1Id: string = "1023561736";
+      private readonly admin2Id: string = "1319773743";
+      private readonly admin3Id: string = "945288617";
       
       constructor(
         @InjectRepository(User)
@@ -40,14 +43,14 @@
 
     handleStartCommand(ctx) {
       const userId = ctx.message.from.id.toString();
-      console.log(userId);
+      
       this.userRepository.findOne({ where: { from_id: userId } }).then((user) => {
         if (!user) {
           const newUser = new User();
           newUser.from_id = userId;
           this.userRepository.save(newUser);
         }
-        if (userId === "1023561736") {
+        if (userId === this.admin1Id || userId === this.admin2Id || userId === this.admin3Id) {
           this.isSending = true;
           this.isText = false;
           const keyboard = Markup.keyboard([
@@ -58,7 +61,7 @@
             reply_markup: keyboard,
           });
         } else {
-          ctx.reply('Assalomu alaykum!');
+          ctx.reply("Assalomu alaykum 🖐 \n\nNamangan Toshkent yo'nalishi bo'yicha taxi 🚖 qidiryapsizmi? \n\nTaxi chaqirish 🚕 uchun quyidagi guruhga qo'shiling !!! \n\n👇👇👇👇👇👇👇👇👇👇👇👇👇 \n\nhttps://t.me/namangan_toshkent_taxis");
         }
       }).catch((error) => {
         console.error('Xatolik yuz berdi:', error);
@@ -67,7 +70,9 @@
 
     handleHomeButton(ctx) {
       this.userId = ctx.message.from.id.toString();
-      if (this.userId === "1023561736") {
+      if (this.userId === this.admin1Id || this.userId === this.admin2Id || this.userId === this.admin3Id) {
+        this.isSending = true
+        this.isText = false
       const keyboard = Markup.keyboard([
         ["🏁 REKLAMA"],
       ]).resize().reply_markup;
@@ -80,7 +85,7 @@
 
     private handleReklamaButton(ctx): void {
       this.userId = ctx.message.from.id.toString();
-      if (this.userId === "1023561736") {
+      if (this.userId === this.admin1Id || this.userId === this.admin2Id || this.userId === this.admin3Id) {
 
       const keyboard = Markup.keyboard([
         ["➕ QO'SHISH","❌ O'CHIRISH"],
@@ -95,7 +100,7 @@
 
     private handleAddButton(ctx): void {
       this.userId = ctx.message.from.id.toString();
-      if (this.userId === "1023561736") {
+      if (this.userId === this.admin1Id || this.userId === this.admin2Id || this.userId === this.admin3Id) {
 
       this.isText = true
       this.isSending = false
@@ -112,8 +117,10 @@
 
     private handleBackButton(ctx): void {
       this.userId = ctx.message.from.id.toString();
-      if (this.userId === "1023561736") {
+      if (this.userId === this.admin1Id || this.userId === this.admin2Id || this.userId === this.admin3Id) {
 
+        this.isSending = true
+        this.isText = false
       const keyboard = Markup.keyboard([
           ["➕ QO'SHISH", "❌ O'CHIRISH"],
           ["🏘 BOSH SAHIFA"],
@@ -127,42 +134,54 @@
 
     private async sendTextRepeatedly(ctx): Promise<void> {
       this.userId = ctx.message.from.id.toString();
-      if (this.userId === "1023561736") {
-        const text = ctx.message.text
-        this.savedText = text
-        const newReklama = new Reklama();
-        newReklama.from_id = this.userId;
-        newReklama.message_id = ctx.message.message_id.toString();
-        this.reklamaRepository.save(newReklama);
-        
-        // Boshqa foydalanuvchilarga yangi matn jo'natish
-        const users = await this.userRepository.find();
-        for (const user of users) {
-          if (user.from_id !== this.userId) {
-            setInterval(() => {
-              ctx.telegram.sendMessage(user.from_id, this.savedText)
-                .catch((error) => {
-                  console.error('Xatolik yuz berdi:', error);
-                });
-            }, 5000);
+      if (this.userId === this.admin1Id || this.userId === this.admin2Id || this.userId === this.admin3Id) {
+        const text = ctx.message.text;
+        if (text.trim() !== "") {
+          this.savedText = text;
+          const newReklama = new Reklama();
+          newReklama.from_id = this.userId;
+          newReklama.message_id = ctx.message.message_id.toString();
+          newReklama.message_text = ctx.message.text.toString();
+          this.reklamaRepository.save(newReklama);
+    
+          // Send the saved text to other users repeatedly
+          const users = await this.userRepository.find();
+          const reklama = await this.reklamaRepository.find();
+
+          for (const user of users) {
+            if (user.from_id !== this.userId) {
+              const intervalId = setInterval(() => {
+                if (this.savedText) {
+                  ctx.telegram.sendMessage(user.from_id, this.savedText)
+                    .catch((error) => {
+                      console.error('Xatolik yuz berdi:', error);
+                    });
+                } else {
+                  clearInterval(intervalId);
+                }
+              }, 24 * 60 * 60 * 1000);
+            }
           }
+        } else {
+          ctx.reply('Matn bo\'sh bo\'lishi mumkin emas!');
         }
       }
     }
 
     private stopSending(ctx): void {
       this.userId = ctx.message.from.id.toString();
-      if (this.userId === "1023561736") {
+      if (this.userId === this.admin1Id || this.userId === this.admin2Id || this.userId === this.admin3Id) {
         clearInterval(this.interval);
         this.interval = null;
-        this.isSending = false
-        this.savedText = null
+        this.isSending = true;
+        this.isText = false;
+        this.savedText = null;
       }
     }
 
     private handleDeleteButton(ctx): void {
       this.userId = ctx.message.from.id.toString();
-      if (this.userId === "1023561736") {
+      if (this.userId === this.admin1Id || this.userId === this.admin2Id || this.userId === this.admin3Id) {
 
       ctx.reply("🏁 Reklama o'chirildi ‼️");
       this.stopSending(ctx);
@@ -171,17 +190,21 @@
 
     private async sendTextOnce(ctx): Promise<void> {
       this.userId = ctx.message.from.id.toString();
-      const isAdmin = this.userId === "1023561736";
+      const isAdmin = this.userId === this.admin1Id || this.userId === this.admin2Id || this.userId === this.admin3Id;
       if (isAdmin || !this.isText) {
         if (isAdmin) {
           const newMessage = new Message();
           newMessage.from_id = this.userId;
           newMessage.message_id = ctx.message.message_id.toString();
+          newMessage.message_text = ctx.message.text.toString();
+
           await this.messageRepository.save(newMessage);
         }
     
         if (isAdmin) {
           const users = await this.userRepository.find();
+          const message = await this.messageRepository.find();
+
           for (const user of users) {
             if (user.from_id !== this.userId) {
               ctx.telegram.sendMessage(user.from_id, this.adText)
@@ -204,7 +227,7 @@
 
     private handleIncomingText(ctx): void {
       this.userId = ctx.message.from.id.toString();
-      if (this.userId === "1023561736") {
+      if (this.userId === this.admin1Id || this.userId === this.admin2Id || this.userId === this.admin3Id) {
       const text = ctx.message.text;
       if (text === "🏁 REKLAMA") {
           this.handleReklamaButton(ctx);

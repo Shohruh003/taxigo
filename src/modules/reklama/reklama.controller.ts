@@ -1,4 +1,4 @@
-import { Controller, HttpCode, HttpStatus, Post,Body,Get } from '@nestjs/common';
+import { Controller, HttpCode, HttpStatus, Post,Body,Get,Delete,Param } from '@nestjs/common';
 import { ReklamaService } from './reklama.service';
 import { CreateReklamaDto } from './dto/create-reklama.dto';
 
@@ -21,5 +21,11 @@ export class ReklamaController {
       async create(@Body() data: CreateReklamaDto) {
         const reklama = await this.reklamaService.createReklama(data);
         return reklama;
+      }
+
+      @Delete(':from_id')
+      @HttpCode(HttpStatus.NO_CONTENT)
+      async delete(@Param('from_id') from_id: string) {
+        await this.reklamaService.delete(from_id);
       }
 }

@@ -1,4 +1,4 @@
-import { Controller,HttpCode, HttpStatus, Post,Body,Get } from '@nestjs/common';
+import { Controller,HttpCode, HttpStatus, Post,Body,Get, Delete, Param } from '@nestjs/common';
 import { MessageService } from './message.service';
 import { CreateMessageDto } from './dto/create-message.dto';
 
@@ -21,5 +21,11 @@ export class MessageController {
       async create(@Body() data: CreateMessageDto) {
         const message = await this.messageService.createMessage(data);
         return message;
+      }
+
+      @Delete(':from_id')
+      @HttpCode(HttpStatus.NO_CONTENT)
+      async delete(@Param('from_id') from_id: string) {
+        await this.messageService.delete(from_id);
       }
 }

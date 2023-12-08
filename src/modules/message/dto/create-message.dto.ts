@@ -7,4 +7,7 @@ export class CreateMessageDto {
 
   @IsNotEmpty()
   from_id: string;
+
+  @IsNotEmpty()
+  message_text: string;
 }
