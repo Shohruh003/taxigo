@@ -54,7 +54,8 @@
           this.isSending = true;
           this.isText = false;
           const keyboard = Markup.keyboard([
-            ["🏁 REKLAMA", "🙍‍♂️ F0YDALANUVCHILAR SONI"],
+            ["🏁 REKLAMA"],
+            ["🙍‍♂️ F0YDALANUVCHILAR SONI"]
           ]).resize().reply_markup;
     
           ctx.reply('Bot ishga tushdi. Assalomu alaykum!', {
@@ -74,7 +75,8 @@
         this.isSending = true
         this.isText = false
       const keyboard = Markup.keyboard([
-        ["🏁 REKLAMA","🙍‍♂️ F0YDALANUVCHILAR SONI"],
+        ["🏁 REKLAMA"],
+        ["🙍‍♂️ F0YDALANUVCHILAR SONI"]
       ]).resize().reply_markup;
     
       ctx.reply('Bosh sahifa 🏘', {
