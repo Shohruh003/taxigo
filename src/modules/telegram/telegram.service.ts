@@ -36,7 +36,7 @@
       bot.on('message', (ctx) => this.handleAddButton(ctx));
       bot.on('message', (ctx) => this.handleDeleteButton(ctx));
       bot.on('message', (ctx) => this.handleBackButton(ctx));
-      bot.on('message', (ctx) => this.handleHomeButton(ctx));
+      bot.on('message', (ctx) => this.handleCountButton(ctx));
       bot.launch();
 
     }
@@ -54,7 +54,7 @@
           this.isSending = true;
           this.isText = false;
           const keyboard = Markup.keyboard([
-            ["🏁 REKLAMA"],
+            ["🏁 REKLAMA", "🙍‍♂️ F0YDALANUVCHILAR SONI"],
           ]).resize().reply_markup;
     
           ctx.reply('Bot ishga tushdi. Assalomu alaykum!', {
@@ -74,7 +74,7 @@
         this.isSending = true
         this.isText = false
       const keyboard = Markup.keyboard([
-        ["🏁 REKLAMA"],
+        ["🏁 REKLAMA","🙍‍♂️ F0YDALANUVCHILAR SONI"],
       ]).resize().reply_markup;
     
       ctx.reply('Bosh sahifa 🏘', {
@@ -147,19 +147,28 @@
           // Send the saved text to other users repeatedly
           const users = await this.userRepository.find();
           const reklama = await this.reklamaRepository.find();
-
+    
           for (const user of users) {
             if (user.from_id !== this.userId) {
-              const intervalId = setInterval(() => {
-                if (this.savedText) {
-                  ctx.telegram.sendMessage(user.from_id, this.savedText)
-                    .catch((error) => {
-                      console.error('Xatolik yuz berdi:', error);
-                    });
-                } else {
-                  clearInterval(intervalId);
+              try {
+                const chatMember = await ctx.telegram.getChatMember(user.chat_id, user.from_id);
+    
+                if (chatMember && chatMember.status !== 'left' && chatMember.status !== 'kicked') {
+                  const intervalId = setInterval(async () => {
+                    if (this.savedText) {
+                      try {
+                        await ctx.telegram.sendMessage(user.from_id, this.savedText);
+                      } catch (error) {
+                        return;
+                      }
+                    } else {
+                      clearInterval(intervalId);
+                    }
+                  }, 7 * 24 * 60 * 60 * 1000);
                 }
-              }, 24 * 60 * 60 * 1000);
+              } catch (error) {
+                console.error('Xatolik yuz berdi:', error);
+              }
             }
           }
         } else {
@@ -188,6 +197,19 @@
       }
     }
 
+    private async handleCountButton(ctx): Promise<void> {
+      this.userId = ctx.message.from.id.toString();
+      const users = await this.userRepository.find();
+      
+      if (this.userId === this.admin1Id || this.userId === this.admin2Id || this.userId === this.admin3Id) {
+        if (users && users.length > 0) {
+          ctx.reply(`🙍‍♂️ Foydalanuvchilar soni:  ${users.length} ta`);
+        } else {
+          ctx.reply("🙍‍♂️ Foydalanuvchilar topilmadi!");
+        }
+      }
+    }
+
     private async sendTextOnce(ctx): Promise<void> {
       this.userId = ctx.message.from.id.toString();
       const isAdmin = this.userId === this.admin1Id || this.userId === this.admin2Id || this.userId === this.admin3Id;
@@ -207,10 +229,19 @@
 
           for (const user of users) {
             if (user.from_id !== this.userId) {
-              ctx.telegram.sendMessage(user.from_id, this.adText)
-                .catch((error) => {
-                  console.error('Xatolik yuz berdi:', error);
-                });
+              try {
+                const chatMember = await ctx.telegram.getChatMember(user.chat_id, user.from_id);
+                
+                if (chatMember && chatMember.status !== 'left' && chatMember.status !== 'kicked') {
+                  try {
+                    await ctx.telegram.sendMessage(user.from_id, this.adText);
+                  } catch (error) {
+                    continue;
+                  }
+                }
+              } catch (error) {
+                console.error('Xatolik yuz berdi:', error);
+              }
             }
           }
         } else {
@@ -231,6 +262,8 @@
       const text = ctx.message.text;
       if (text === "🏁 REKLAMA") {
           this.handleReklamaButton(ctx);
+        }else if (text === "🙍‍♂️ F0YDALANUVCHILAR SONI") {
+          this.handleCountButton(ctx)
         } else if (text === "🏘 BOSH SAHIFA") {
           this.handleHomeButton(ctx);
         }else if (text === "➕ QO'SHISH") {
@@ -239,7 +272,7 @@
           this.handleDeleteButton(ctx);
         } else if (text === "⬅️ ORQAGA") {
           this.handleBackButton(ctx);
-        }else {
+        } else {
           if (this.isText === false) {
         this.adText = text;
         this.sendTextOnce(ctx);

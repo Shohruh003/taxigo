@@ -4,4 +4,7 @@ export class CreateUsersDto {
 
   @IsNotEmpty()
   from_id: string;
+
+  @IsNotEmpty()
+  chat_id: string;
 }

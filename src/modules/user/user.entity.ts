@@ -10,4 +10,10 @@ export class User extends BaseEntity{
     nullable: true,
   })
   from_id: string;
+
+  @Column({
+    type: 'varchar',
+    nullable: true,
+  })
+  chat_id: string;
 }
