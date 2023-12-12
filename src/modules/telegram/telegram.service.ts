@@ -19,7 +19,7 @@
       private userId: string;
       private readonly admin1Id: string = "1023561736";
       private readonly admin2Id: string = "1319773743";
-      private readonly admin3Id: string = "945288617";
+      private readonly admin3Id: string = "66048079";
       
       constructor(
         @InjectRepository(User)
