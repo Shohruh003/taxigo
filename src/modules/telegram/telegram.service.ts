@@ -62,7 +62,7 @@
             reply_markup: keyboard,
           });
         } else {
-          ctx.reply("Assalomu alaykum 🖐 \n\nNamangan Toshkent yo'nalishi bo'yicha taxi 🚖 qidiryapsizmi? \n\nTaxi chaqirish 🚕 uchun quyidagi guruhga qo'shiling !!! \n\n👇👇👇👇👇👇👇👇👇👇👇👇👇 \n\nhttps://t.me/namangan_toshkent_taxis");
+          ctx.reply("Assalomu alaykum 🖐 \n\nNamangan Toshkent yo'nalishi bo'yicha taxi 🚖 qidiryapsizmi? \n\nTaxi chaqirish 🚕 uchun quyidagi guruhga qo'shiling !!! \n\n👇👇👇👇👇👇👇👇👇👇👇👇👇 \n\nhttps://t.me/Namangan_tashkent_pitak");
         }
       }).catch((error) => {
         console.error('Xatolik yuz berdi:', error);
